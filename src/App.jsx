@@ -1,26 +1,23 @@
 import "./App.css"
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
-import { BrowserRouter as Router, Route } from "react-router-dom"
+import "swiper/css"
+import "swiper/css/navigation"
+import "swiper/css/pagination"
+import { BrowserRouter } from "react-router-dom"
 import Header from "./components/header/Header"
 import Footer from "./components/footer/Footer"
 import Routes from "./config/Routes"
 
 function App() {
   return (
-    <Router>
-      <Route
-        render={(props) => (
-          <>
-            <div className="bg-gray-900">
-              <Header {...props} />
-              <Routes />
-              <Footer />
-            </div>
-          </>
-        )}
-      />
-    </Router>
+    <BrowserRouter>
+      <div className="bg-[#0f1014] min-h-screen flex flex-col font-body text-white">
+        <Header />
+        <main className="flex-grow">
+          <Routes />
+        </main>
+        <Footer />
+      </div>
+    </BrowserRouter>
   )
 }
 

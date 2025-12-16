@@ -1,46 +1,16 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
+import { Swiper, SwiperSlide } from "swiper/react"
 import tmdbApi from "../../api/tmdbApi"
 import VideoCard from "./VideoCard"
-import Slider from "react-slick"
+import VideoModal from "../../components/common/VideoModal"
 
 const VideoList = (props) => {
-  const settings = {
-    className: "text-white",
-    infinite: false,
-    autoplay: false,
-    slidesToShow: 4,
-    slidesToScroll: 4,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 3,
-          infinite: true,
-          dots: true,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 2,
-          initialSlide: 2,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  }
-
   const { category } = useParams()
   const [videos, setVideos] = useState([])
+  const [selectedVideo, setSelectedVideo] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   useEffect(() => {
     const getVideos = async () => {
       const res = await tmdbApi.getVideos(category, props.id)
@@ -48,15 +18,38 @@ const VideoList = (props) => {
     }
     getVideos()
   }, [category, props.id])
+
+  const handleVideoClick = (key) => {
+    setSelectedVideo(key)
+    setIsModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setSelectedVideo(null)
+  }
+
   return (
     <>
-      <Slider {...settings}>
+      <Swiper
+        grabCursor={true}
+        spaceBetween={10}
+        slidesPerView={"auto"}
+      >
         {videos.map((item, i) => (
-          <div key={i}>
-            <VideoCard item={item} />
-          </div>
+          <SwiperSlide key={i} className="!w-[80%] md:!w-[40%] lg:!w-[25%] px-2">
+            <VideoCard item={item} onClick={() => handleVideoClick(item.key)} />
+          </SwiperSlide>
         ))}
-      </Slider>
+      </Swiper>
+      
+      {selectedVideo && (
+        <VideoModal 
+            isOpen={isModalOpen} 
+            onClose={closeModal} 
+            videoKey={selectedVideo} 
+        />
+      )}
     </>
   )
 }

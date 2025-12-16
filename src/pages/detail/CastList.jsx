@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import tmdbApi from "../../api/tmdbApi"
 import apiConfig from "../../api/apiConfig"
+import { motion } from "framer-motion"
 
 const CastList = (props) => {
   const { category } = useParams()
@@ -14,17 +15,23 @@ const CastList = (props) => {
     getCredits()
   }, [category, props.id])
   return (
-    <div className="casts">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
       {casts.map((item, i) => (
-        <div className="casts-item" key={i}>
+        <motion.div 
+            key={i}
+            whileHover={{ y: -5 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="group cursor-pointer"
+        >
           <div
-            className="casts-item-img"
+            className="pt-[160px] bg-cover bg-center mb-3 rounded-xl shadow-lg border border-[#1f2126] transition-all group-hover:border-white/30"
             style={{
               backgroundImage: `url(${apiConfig.w500Image(item.profile_path)})`,
             }}
           ></div>
-          <p className="casts-item-name text-white">{item.name}</p>
-        </div>
+          <p className="text-white text-sm font-semibold truncate group-hover:text-primary transition-colors">{item.name}</p>
+          <p className="text-gray-400 text-xs truncate">{item.character}</p>
+        </motion.div>
       ))}
     </div>
   )

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react"
-import { useHistory, useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import MovieCard from "../movieCard/MovieCard"
-import { OutlineButton } from "../button/Button"
+import Button, { OutlineButton } from "../button/Button"
 import Input from "../input/Input"
 import tmdbApi, { category, movieType, tvType } from "../../api/tmdbApi"
 
@@ -19,11 +19,6 @@ const MovieGrid = (props) => {
         switch (props.category) {
           case category.movie:
             response = await tmdbApi.getMovieList(movieType.upcoming, {
-              params,
-            })
-            break
-          case category.kids:
-            response = await tmdbApi.getKidsList(kidsType.popular, {
               params,
             })
             break
@@ -65,10 +60,10 @@ const MovieGrid = (props) => {
   }
   return (
     <>
-      <div className="section mb-12">
+      <div className="mb-12">
         <MovieSearch category={props.category} keyword={keyword} />
       </div>
-      <div className="px-10 grid grid-cols-[repeat(auto-fill,_minmax(200px,_1fr))] gap-5 mb-12">
+      <div className="px-10 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5 mb-12">
         {items.map((item, i) => (
           <MovieCard category={props.category} item={item} key={i} />
         ))}
@@ -85,13 +80,15 @@ const MovieGrid = (props) => {
 }
 
 const MovieSearch = (props) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const [keyword, setKeyword] = useState(props.keyword ? props.keyword : "")
+  
   const goToSearch = useCallback(() => {
     if (keyword.trim().length > 0) {
-      history.push(`/${category[props.category]}/search/${keyword}`)
+      navigate(`/${category[props.category]}/search/${keyword}`)
     }
-  }, [keyword, props.category, history])
+  }, [keyword, props.category, navigate])
+
   useEffect(() => {
     const enterEvent = (e) => {
       e.preventDefault()
@@ -106,13 +103,14 @@ const MovieSearch = (props) => {
   }, [keyword, goToSearch])
 
   return (
-    <div className="movie-search">
+    <div className="flex items-center justify-center mb-8">
       <Input
         type="text"
         placeholder="Enter Title"
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
       />
+      <Button className="small ml-2" onClick={goToSearch}>Search</Button>
     </div>
   )
 }
