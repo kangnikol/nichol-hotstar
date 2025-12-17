@@ -32,7 +32,7 @@ const Detail = () => {
   useEffect(() => {
     const setModalContent = async () => {
       if (item) {
-        const videos = await tmdbApi.getVideos(cate.movie, item.id)
+        const videos = await tmdbApi.getVideos(category, item.id)
 
         if (videos.results.length > 0) {
           const videoSrc = "https://www.youtube.com/embed/" + videos.results[0].key
