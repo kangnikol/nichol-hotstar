@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react"
 import { Link, useLocation } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import logo from "../../assets/logo1.png"
 
 const headerNav = [
@@ -20,6 +21,7 @@ const headerNav = [
 const Header = () => {
   const { pathname } = useLocation()
   const headerRef = useRef(null)
+  const { t } = useTranslation()
 
   useEffect(() => {
     const shrinkHeader = () => {
@@ -51,7 +53,7 @@ const Header = () => {
         <ul className="flex items-center gap-8 font-semibold">
           {headerNav.map((e, i) => (
             <li key={i} className={`${i === active ? "text-white border-b-2 border-white pb-1" : "text-gray-400 hover:text-white"} transition-colors text-lg cursor-pointer`}>
-              <Link to={e.path}>{e.display}</Link>
+              <Link to={e.path}>{t(e.display)}</Link>
             </li>
           ))}
         </ul>

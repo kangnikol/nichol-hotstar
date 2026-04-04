@@ -3,10 +3,14 @@ import { useParams } from "react-router-dom"
 import tmdbApi from "../../api/tmdbApi"
 import apiConfig from "../../api/apiConfig"
 import { motion } from "framer-motion"
+import ScrollReveal from "../../components/common/ScrollReveal"
+import { useTranslation } from "react-i18next"
 
 const CastList = (props) => {
   const { category } = useParams()
   const [casts, setCasts] = useState([])
+  const { t } = useTranslation()
+
   useEffect(() => {
     const getCredits = async () => {
       const res = await tmdbApi.credits(category, props.id)
@@ -14,7 +18,12 @@ const CastList = (props) => {
     }
     getCredits()
   }, [category, props.id])
+
+  if (casts.length === 0) return null
+
   return (
+    <ScrollReveal>
+      <h2 className="text-2xl font-semibold mb-6 border-l-4 border-primary pl-3">{t("Cast")}</h2>
     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
       {casts.map((item, i) => (
         <motion.div 
@@ -28,12 +37,15 @@ const CastList = (props) => {
             style={{
               backgroundImage: `url(${apiConfig.w500Image(item.profile_path)})`,
             }}
-          ></div>
+          >
+            <img src={apiConfig.w500Image(item.profile_path)} alt="" loading="lazy" className="sr-only" aria-hidden="true" />
+          </div>
           <p className="text-white text-sm font-semibold truncate group-hover:text-primary transition-colors">{item.name}</p>
           <p className="text-gray-400 text-xs truncate">{item.character}</p>
         </motion.div>
       ))}
     </div>
+    </ScrollReveal>
   )
 }
 

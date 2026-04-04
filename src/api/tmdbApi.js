@@ -46,6 +46,10 @@ const tmdbApi = {
     const url = category[cate] + "/" + id + "/similar"
     return axiosClient.get(url, { params: {} })
   },
+  tvSeason: (id, season_number) => {
+    const url = "tv/" + id + "/season/" + season_number
+    return axiosClient.get(url, { params: {} })
+  },
 }
 
 export default tmdbApi

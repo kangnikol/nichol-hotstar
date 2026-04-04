@@ -6,6 +6,7 @@ import tmdbApi, { movieType } from "../../api/tmdbApi"
 import apiConfig from "../../api/apiConfig"
 import { useNavigate } from "react-router-dom"
 import Button, { OutlineButton } from "../button/Button"
+import { useTranslation } from "react-i18next"
 
 const HeroSlide = () => {
   const [movieItems, setMovieItems] = useState([])
@@ -49,18 +50,19 @@ const HeroSlide = () => {
 
 const HeroSlideItem = ({ item, active }) => {
   let navigate = useNavigate()
+  const { t } = useTranslation()
   const background = apiConfig.originalImage(item.backdrop_path ? item.backdrop_path : item.poster_path)
 
   return (
     <div
-      className="relative w-full h-full bg-cover bg-center bg-no-repeat"
+      className={`relative w-full h-full bg-cover bg-center bg-no-repeat ${active ? "" : "pointer-events-none"}`}
       style={{ backgroundImage: `url(${background})` }}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0B1120] via-[#0B1120]/40 to-transparent z-10" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0B1120] via-[#0B1120]/40 to-transparent z-10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0B1120] via-[#0B1120]/40 to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0B1120] via-[#0B1120]/40 to-transparent z-10 pointer-events-none" />
       
-      <div className="absolute w-full h-full flex items-center justify-start px-8 lg:px-24 z-20 pt-20">
-        <div className="w-full lg:w-[55%]">
+      <div className={`absolute w-full h-full flex items-center justify-start px-8 lg:px-24 z-30 pt-20 ${active ? "pointer-events-auto" : "pointer-events-none"}`}>
+        <div className="w-full lg:w-[55%] pointer-events-auto">
             <AnimatePresence mode="wait">
                 {active && (
                    <motion.div>
@@ -84,13 +86,13 @@ const HeroSlideItem = ({ item, active }) => {
                              initial={{ opacity: 0, y: 30 }}
                              animate={{ opacity: 1, y: 0 }}
                              transition={{ duration: 0.8, ease: "easeOut", delay: 0.6 }}
-                             className="flex gap-4"
+                             className="flex gap-4 pointer-events-auto"
                         >
-                            <Button onClick={() => navigate("/movie/" + item.id)} className="shadow-[0_0_20px_rgba(255,0,0,0.4)] hover:shadow-[0_0_30px_rgba(255,0,0,0.6)] !py-3 !px-8 text-lg">
-                                Watch Now
+                            <Button onClick={() => navigate("/movie/" + item.id)} className="shadow-[0_0_20px_rgba(255,255,255,0.4)] hover:shadow-[0_0_30px_rgba(255,255,255,0.6)] !py-3 !px-8 text-lg relative z-[100]">
+                                {t("See Detail")}
                             </Button>
-                            <OutlineButton className="!py-3 !px-8 text-lg backdrop-blur-sm" onClick={() => console.log('Trailer')}>
-                                Watch Trailer
+                            <OutlineButton className="!py-3 !px-8 text-lg backdrop-blur-sm relative z-[100]" onClick={() => navigate("/play/movie/" + item.id)}>
+                                {t("Watch Now")}
                             </OutlineButton>
                         </motion.div>
                    </motion.div>
@@ -98,14 +100,14 @@ const HeroSlideItem = ({ item, active }) => {
             </AnimatePresence>
         </div>
         
-        <div className="hidden lg:block lg:w-[45%] h-full relative z-10">
+        <div className="hidden lg:flex lg:w-[45%] h-full relative z-10 items-center justify-center">
             {active && (
                 <motion.img 
-                    initial={{ opacity: 0, scale: 0.8, rotate: 6 }}
-                    animate={{ opacity: 1, scale: 1, rotate: 6 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
                     src={apiConfig.w500Image(item.poster_path)}
-                    className="w-[350px] h-auto rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] absolute right-24 top-1/2 -translate-y-1/2 hover:rotate-2 hover:scale-105 transition-all duration-500 cursor-pointer border border-white/10"
+                    className="w-[350px] h-auto rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:scale-105 transition-transform duration-500 cursor-pointer border border-white/10"
                     alt=""
                 />
             )}

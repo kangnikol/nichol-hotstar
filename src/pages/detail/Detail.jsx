@@ -6,18 +6,35 @@ import VideoList from "./VideoList"
 import MovieList from "../../components/movieList/MovieList"
 import CastList from "./CastList"
 import { format } from "date-fns"
-import Button from "../../components/button/Button"
+import Button, { OutlineButton } from "../../components/button/Button"
+import { useNavigate } from "react-router-dom"
 import { Dialog, Transition } from "@headlessui/react"
 import AnimatedPage from "../../components/common/AnimatedPage"
 import ScrollReveal from "../../components/common/ScrollReveal"
 import { motion } from "framer-motion"
+import { useTranslation } from "react-i18next"
+import TvEpisodeSelector from "../../components/common/TvEpisodeSelector"
 
 const Detail = () => {
+  const { t } = useTranslation()
   const { category, id } = useParams()
   const [item, setItem] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEpisodeSelectorOpen, setIsEpisodeSelectorOpen] = useState(false)
   const modalRef = useRef(null)
   const iframeRef = useRef(null)
+  const navigate = useNavigate()
+
+  const openModal = () => setIsModalOpen(true)
+  const closeModal = () => setIsModalOpen(false)
+
+  const handleWatchNow = () => {
+    if (category === "tv") {
+      setIsEpisodeSelectorOpen(true)
+    } else {
+      navigate(`/play/${category}/${item.id}`)
+    }
+  }
 
   useEffect(() => {
     const getDetail = async () => {
@@ -47,10 +64,6 @@ const Detail = () => {
       setModalContent()
     }
   }, [isModalOpen, item])
-
-  const openModal = () => {
-    setIsModalOpen(true)
-  }
 
   const time_convert = (num) => {
     const hours = Math.floor(num / 60)
@@ -114,43 +127,47 @@ const Detail = () => {
                        </motion.p>
                        
                        <motion.div 
-                          initial={{ opacity: 0, y: 20 }}
+                          initial={{ opacity: 0, y: 30 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.5 }}
+                          transition={{ duration: 0.8, ease: "easeOut", delay: 0.6 }}
+                          className="flex gap-4"
                        >
-                           <Button onClick={openModal} className="flex items-center gap-3 text-xl px-10 py-4 !bg-white !text-black hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-                              <i className="fa-solid fa-play"></i> Watch Trailer
+                           <Button onClick={handleWatchNow} className="flex items-center gap-3 text-xl px-10 py-4 !bg-primary text-white hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,0,0,0.3)] border-none">
+                              <i className="fa-solid fa-play"></i> {t("Watch Now")}
                            </Button>
+                           <OutlineButton onClick={openModal} className="flex items-center gap-3 text-xl px-10 py-4 hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                              {t("Watch Trailer")}
+                           </OutlineButton>
                        </motion.div>
                  </div>
               </div>
           </div>
           
           <div className="px-8 lg:px-12 py-10 text-white max-w-[1600px] mx-auto space-y-16">
-            <ScrollReveal>
-                <h2 className="text-2xl font-semibold mb-6 border-l-4 border-primary pl-3">Cast</h2>
-                <CastList id={item.id} />
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.1}>
-               <h2 className="text-2xl font-semibold mb-6 border-l-4 border-primary pl-3">Trailers & Clips</h2>
-               <VideoList id={item.id} />
-            </ScrollReveal>
+            <CastList id={item.id} />
+            <VideoList id={item.id} />
 
             <ScrollReveal delay={0.2}>
                <div className="section-header mb-6">
-                   <h2 className="text-2xl font-semibold border-l-4 border-primary pl-3">More Like This</h2>
+                   <h2 className="text-2xl font-semibold border-l-4 border-primary pl-3">{t("More Like This")}</h2>
                </div>
                <MovieList category={category} type="similar" id={item.id} />
             </ScrollReveal>
             
              <TrailerDialog
               isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
+              onClose={closeModal}
               item={item.id}
               ref={modalRef}
               iframeRef={iframeRef}
             />
+            {category === "tv" && (
+              <TvEpisodeSelector 
+                  isOpen={isEpisodeSelectorOpen}
+                  onClose={() => setIsEpisodeSelectorOpen(false)}
+                  item={item}
+              />
+            )}
           </div>
         </>
       )}

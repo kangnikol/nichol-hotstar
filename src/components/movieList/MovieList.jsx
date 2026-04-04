@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, memo } from "react"
 import PropTypes from "prop-types"
 import { Swiper, SwiperSlide } from "swiper/react"
 import tmdbApi, { category } from "../../api/tmdbApi"
 import MovieCard from "../movieCard/MovieCard"
 
-const MovieList = (props) => {
+const MovieList = memo((props) => {
   const [items, setItems] = useState([])
 
   useEffect(() => {
@@ -43,7 +43,9 @@ const MovieList = (props) => {
       </Swiper>
     </div>
   )
-}
+})
+
+MovieList.displayName = "MovieList"
 
 MovieList.propTypes = {
   category: PropTypes.string.isRequired,

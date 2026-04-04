@@ -4,43 +4,19 @@ import MovieCard from "../movieCard/MovieCard"
 import Button, { OutlineButton } from "../button/Button"
 import Input from "../input/Input"
 import tmdbApi, { category, movieType, tvType } from "../../api/tmdbApi"
+import { useTranslation } from "react-i18next"
 
 const MovieGrid = (props) => {
+  const { t } = useTranslation()
   const [items, setItems] = useState([])
   const [page, setPage] = useState(1)
   const [totalPage, setTotalPage] = useState(0)
   const { keyword } = useParams()
 
-  useEffect(() => {
-    const getList = async () => {
-      let response = null
-      if (keyword === undefined) {
-        const params = {}
-        switch (props.category) {
-          case category.movie:
-            response = await tmdbApi.getMovieList(movieType.upcoming, {
-              params,
-            })
-            break
-          default:
-            response = await tmdbApi.getTvList(tvType.popular, { params })
-        }
-      } else {
-        const params = {
-          query: keyword,
-        }
-        response = await tmdbApi.search(props.category, { params })
-      }
-      setItems(response.results)
-      setTotalPage(response.total_pages)
-    }
-    getList()
-  }, [props.category, keyword])
-
-  const loadMore = async () => {
+  const fetchData = useCallback(async (pageNum) => {
     let response = null
     if (keyword === undefined) {
-      const params = { page: page + 1 }
+      const params = { page: pageNum }
       switch (props.category) {
         case category.movie:
           response = await tmdbApi.getMovieList(movieType.upcoming, { params })
@@ -49,15 +25,28 @@ const MovieGrid = (props) => {
           response = await tmdbApi.getTvList(tvType.popular, { params })
       }
     } else {
-      const params = {
-        page: page + 1,
-        query: keyword,
-      }
-      response = await tmdbApi.search(props.category, { params })
+      response = await tmdbApi.search(props.category, { params: { query: keyword, page: pageNum } })
     }
-    setItems([...items, ...response.results])
-    setPage(page + 1)
+    return response
+  }, [props.category, keyword])
+
+  useEffect(() => {
+    const init = async () => {
+      const response = await fetchData(1)
+      setItems(response.results)
+      setTotalPage(response.total_pages)
+      setPage(1)
+    }
+    init()
+  }, [fetchData])
+
+  const loadMore = async () => {
+    const nextPage = page + 1
+    const response = await fetchData(nextPage)
+    setItems(prev => [...prev, ...response.results])
+    setPage(nextPage)
   }
+
   return (
     <>
       <div className="mb-12">
@@ -71,7 +60,7 @@ const MovieGrid = (props) => {
       {page < totalPage ? (
         <div className="text-center">
           <OutlineButton className="small" onClick={loadMore}>
-            Load More
+            {t("Load More")}
           </OutlineButton>
         </div>
       ) : null}
@@ -81,6 +70,7 @@ const MovieGrid = (props) => {
 
 const MovieSearch = (props) => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [keyword, setKeyword] = useState(props.keyword ? props.keyword : "")
   
   const goToSearch = useCallback(() => {
@@ -106,11 +96,11 @@ const MovieSearch = (props) => {
     <div className="flex items-center justify-center mb-8">
       <Input
         type="text"
-        placeholder="Enter Title"
+        placeholder={t("Enter Title")}
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
       />
-      <Button className="small ml-2" onClick={goToSearch}>Search</Button>
+      <Button className="small ml-2" onClick={goToSearch}>{t("Search")}</Button>
     </div>
   )
 }

@@ -4,12 +4,15 @@ import { Swiper, SwiperSlide } from "swiper/react"
 import tmdbApi from "../../api/tmdbApi"
 import VideoCard from "./VideoCard"
 import VideoModal from "../../components/common/VideoModal"
+import ScrollReveal from "../../components/common/ScrollReveal"
+import { useTranslation } from "react-i18next"
 
 const VideoList = (props) => {
   const { category } = useParams()
   const [videos, setVideos] = useState([])
   const [selectedVideo, setSelectedVideo] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const { t } = useTranslation()
 
   useEffect(() => {
     const getVideos = async () => {
@@ -29,8 +32,11 @@ const VideoList = (props) => {
     setSelectedVideo(null)
   }
 
+  if (videos.length === 0) return null
+
   return (
-    <>
+    <ScrollReveal delay={0.1}>
+      <h2 className="text-2xl font-semibold mb-6 border-l-4 border-primary pl-3">{t("Trailers & Clips")}</h2>
       <Swiper
         grabCursor={true}
         spaceBetween={10}
@@ -50,7 +56,7 @@ const VideoList = (props) => {
             videoKey={selectedVideo} 
         />
       )}
-    </>
+    </ScrollReveal>
   )
 }
 
